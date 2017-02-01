@@ -32,8 +32,14 @@ class Product(db.Model):
     def __repr__(self):
         return '<Product {0}>'.format(self.name)
 
-    def __str__(self):
-        return str(self.__dict__)
+    def to_json(self):
+        return {
+            'name': self.name,
+            'discounted_price': self.discounted_price,
+            'high_price': self.high_price,
+            'item_number': self.item_number,
+            'category': self.category
+        }
 
 
 class Category(db.Model):
@@ -46,8 +52,8 @@ class Category(db.Model):
     def __repr__(self):
         return '<Category {0}>'.format(self.title)
 
-    def __str__(self):
-        return str(self.__dict__)
+    def to_json(self):
+        return {'title': self.title}
 
 
 def init_db():
@@ -80,7 +86,7 @@ def import_from_json(json_data):
 @app.route('/categories', methods=['GET'])
 def get_categories():
     # produce json of the string representations of all the categories
-    return json_response(list(map(str, Category.query.all())))
+    return json_response(list(map(lambda category: category.to_json(), Category.query.all())))
 
 
 def json_response(obj, status=200):

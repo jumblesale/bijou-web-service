@@ -2,7 +2,7 @@ from behave import *
 
 @given(u'I have imported example data')
 def step_impl(context):
-    
+    pass
 
 @when(u'I get all categories from the database')
 def step_impl(context):

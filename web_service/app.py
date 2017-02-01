@@ -8,6 +8,7 @@ app = Flask(__name__)
 
 # set up the sqlite instance
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/bijou.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 
 
@@ -61,6 +62,11 @@ class Category(db.Model):
 def init_db():
     db.drop_all()
     db.create_all()
+
+
+def import_from_json_file(path):
+    with open(path, 'r') as contents:
+        import_from_json(contents.read())
 
 
 def import_from_json(json_data):
@@ -122,4 +128,8 @@ def json_response(obj, status=200):
     ))
 
 if __name__ == "__main__":
+    import os
+    import sys
+
+    sys.path.append(os.getcwd())
     app.run()

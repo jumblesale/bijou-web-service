@@ -1,4 +1,5 @@
 from behave import *
+from hamcrest import assert_that, equal_to
 import web_service.app as app
 from os import path
 import requests as r
@@ -26,5 +27,5 @@ def step_impl(context):
 @then(u'I get the following list of categories')
 def step_impl(context):
     expected_titles = [row['title'] for row in context.table]
-    actual_titles = context.response
-    print(context.response)
+    actual_titles = [row['title'] for row in context.response]
+    assert_that(actual_titles, equal_to(expected_titles))

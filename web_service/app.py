@@ -14,7 +14,7 @@ db = SQLAlchemy(app)
 # define the db models
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=True)
+    name = db.Column(db.String(120), index=True)
     discounted_price = db.Column(db.Integer)
     high_price = db.Column(db.Integer)
     item_number = db.Column(db.String(32), unique=True)
@@ -85,20 +85,32 @@ def import_from_json(json_data):
 @app.route('/categories', methods=['GET'])
 def get_categories():
     # produce json of the string representations of all the categories
-    return json_response(list(map(lambda category: category.to_json(), Category.query.all())))
+    return json_response({
+        'categories': list(map(lambda category: category.to_json(), Category.query.all()))
+    })
 
 
 @app.route('/category/<title>', methods=['GET'])
 def get_category(title):
     category = Category.query.filter_by(title=title).first()
-    print(category)
     if category is None:
         abort(404)
     else:
         products = category.products.all()
         category_dict = category.to_json()
-        products_dicts = list(map(lambda product: product.to_json(), products))
+        products_dicts = models_to_json(products)
         return json_response({'category': category_dict, 'products': products_dicts})
+
+
+@app.route('/products', methods=['GET'])
+def get_products():
+    return json_response({
+        'products': models_to_json(Product.query.all())
+    })
+
+
+def models_to_json(models):
+    return list(map(lambda model: model.to_json(), models))
 
 
 def json_response(obj, status=200):

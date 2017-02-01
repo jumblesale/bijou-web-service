@@ -20,14 +20,14 @@ def step_impl(context, file_name):
 @when(u'I get all categories from the database')
 def step_impl(context):
     response = r.get(host['url'] + '/categories')
-    assert 200 == response.status_code
+    assert_that(response.status_code, equal_to(200))
     context.response = response.json()
 
 
 @then(u'I get the following list of categories')
 def step_impl(context):
     expected_titles = [row['title'] for row in context.table]
-    actual_titles = [row['title'] for row in context.response]
+    actual_titles = [row['title'] for row in context.response['categories']]
     assert_that(actual_titles, equal_to(expected_titles))
 
 
@@ -35,10 +35,17 @@ def step_impl(context):
 def step_impl(context, title):
     response = r.get(host['url'] + '/category/{0}'.format(title))
     assert_that(response.status_code, equal_to(200))
-    context.category = response.json()
+    context.response = response.json()
 
 
 @then(u'I a list of {count:d} products')
 def step_impl(context, count):
-    category = context.category
+    category = context.response
     assert_that(len(category['products']), equal_to(count))
+
+
+@when(u'I get all products')
+def step_impl(context):
+    response = r.get(host['url'] + '/products')
+    assert_that(response.status_code, equal_to(200))
+    context.response = response.json()

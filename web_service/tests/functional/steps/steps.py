@@ -29,3 +29,16 @@ def step_impl(context):
     expected_titles = [row['title'] for row in context.table]
     actual_titles = [row['title'] for row in context.response]
     assert_that(actual_titles, equal_to(expected_titles))
+
+
+@when(u'I get products belonging to the {title} category')
+def step_impl(context, title):
+    response = r.get(host['url'] + '/category/{0}'.format(title))
+    assert_that(response.status_code, equal_to(200))
+    context.category = response.json()
+
+
+@then(u'I a list of {count:d} products')
+def step_impl(context, count):
+    category = context.category
+    assert_that(len(category['products']), equal_to(count))

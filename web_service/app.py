@@ -1,4 +1,4 @@
-from flask import Flask, make_response
+from flask import Flask, make_response, abort
 import json
 
 from flask_sqlalchemy import SQLAlchemy
@@ -37,8 +37,7 @@ class Product(db.Model):
             'name': self.name,
             'discounted_price': self.discounted_price,
             'high_price': self.high_price,
-            'item_number': self.item_number,
-            'category': self.category
+            'item_number': self.item_number
         }
 
 
@@ -87,6 +86,19 @@ def import_from_json(json_data):
 def get_categories():
     # produce json of the string representations of all the categories
     return json_response(list(map(lambda category: category.to_json(), Category.query.all())))
+
+
+@app.route('/category/<title>', methods=['GET'])
+def get_category(title):
+    category = Category.query.filter_by(title=title).first()
+    print(category)
+    if category is None:
+        abort(404)
+    else:
+        products = category.products.all()
+        category_dict = category.to_json()
+        products_dicts = list(map(lambda product: product.to_json(), products))
+        return json_response({'category': category_dict, 'products': products_dicts})
 
 
 def json_response(obj, status=200):

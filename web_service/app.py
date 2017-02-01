@@ -128,8 +128,4 @@ def json_response(obj, status=200):
     ))
 
 if __name__ == "__main__":
-    import os
-    import sys
-
-    sys.path.append(os.getcwd())
     app.run()

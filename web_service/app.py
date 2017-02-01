@@ -18,7 +18,6 @@ class Product(db.Model):
     discounted_price = db.Column(db.Integer)
     high_price = db.Column(db.Integer)
     item_number = db.Column(db.String(32), unique=True)
-
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     category = db.relationship('Category',
         backref=db.backref('products', lazy='dynamic'))
@@ -45,13 +44,31 @@ class Category(db.Model):
         return '<Category {0}>'.format(self.title)
 
 
-def import_from_json(json):
+def init_db():
+    db.drop_all()
+    db.create_all()
+
+
+def import_from_json(json_data):
     """
     Import data into the database from a JSON file
-    :param json: a json string represting categories and products
+    :param json: a json string representing categories and products
     :return: Nothing
     """
-    pass
+    parsed = json.loads(json_data)
+    for category in parsed:
+        category_model = Category(category['title'])
+        for product in category['products']:
+            product_model = Product(
+                product['name'],
+                product['discounted_price'],
+                product['high_price'],
+                product['item_number'],
+                category_model
+            )
+            db.session.add(product_model)
+        db.session.add(category_model)
+    db.session.commit()
 
 
 @app.route('/')

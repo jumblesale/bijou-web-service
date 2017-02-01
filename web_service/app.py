@@ -15,8 +15,8 @@ db = SQLAlchemy(app)
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), index=True)
-    discounted_price = db.Column(db.Integer)
-    high_price = db.Column(db.Integer)
+    discounted_price = db.Column(db.Float(precision=2), nullable=True)
+    high_price = db.Column(db.Float(precision=2))
     item_number = db.Column(db.String(32), unique=True)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     category = db.relationship('Category',
@@ -24,8 +24,11 @@ class Product(db.Model):
 
     def __init__(self, name, discounted_price, high_price, item_number, category):
         self.name = name
-        self.discounted_price = discounted_price
-        self.high_price = high_price
+        if discounted_price == '':
+            self.discounted_price = None
+        else:
+            self.discounted_price = float(discounted_price)
+        self.high_price = float(high_price)
         self.item_number = item_number
         self.category = category
 

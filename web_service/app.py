@@ -38,8 +38,8 @@ class Product(db.Model):
     def to_json(self):
         return {
             'name': self.name,
-            'discounted_price': self.discounted_price,
-            'high_price': self.high_price,
+            'discounted_price': '' if self.discounted_price is None else '{0:.2f}'.format(self.discounted_price),
+            'high_price': "{0:.2f}".format(self.high_price),
             'item_number': self.item_number
         }
 
